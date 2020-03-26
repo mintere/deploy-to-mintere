@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+require("ts-node/register");
+
+const archiver = require("archiver");
+
+const deploy = require("../deploy").default;
+
+const DEPLOYMENT_KEY = process.env.DEPLOYMENT_KEY;
+
+const [buildDirectory, uploadUrl] = process.argv.slice(2);
+
+const archive = archiver("zip", {
+  zlib: { level: 5 }
+});
+
+archive.directory(buildDirectory, false);
+archive.finalize();
+
+deploy({
+  archive,
+  uploadUrl,
+  deploymentKey: DEPLOYMENT_KEY
+})
+  .then((data) => {
+    console.log(data.deploymentUrl);
+  })
+  .catch((e) => {
+    console.log("Error status: ", e.statusCode);
+  });

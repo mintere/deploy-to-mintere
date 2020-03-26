@@ -1,13 +1,30 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: "Deploy to Mintere"
+author: "Mintere"
+description: "Deploys a site to the Mintere platform CMS"
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  githubToken:
+    description: "A GitHub token for this repo"
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps 
-    description: 'The message to output'
+    default: ${{ secrets.GITHUB_TOKEN }}
+  environmentName:
+    description: "The name of the environment, defaults to the source branch name (or production if the branch name is master)."
+    required: false
+  uploadURL:
+    description: "URL to Upload To"
+    required: true
+    default: "https://sites.mintere.com/upload"
+  buildDirectory:
+    description: "The subdirectory to deploy"
+    required: true
+    default: "out/"
+  deploymentKey:
+    description: "A deploy key from the Mintere Platform"
+    required: true
+
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
+
+branding:
+  icon: "feather"
+  color: "green"
