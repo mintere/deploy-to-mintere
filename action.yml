@@ -5,7 +5,6 @@ inputs:
   githubToken:
     description: "A GitHub token for this repo"
     required: true
-    default: ${{ secrets.GITHUB_TOKEN }}
   environmentName:
     description: "The name of the environment, defaults to the source branch name (or production if the branch name is master)."
     required: false
