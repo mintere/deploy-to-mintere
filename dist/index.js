@@ -33309,8 +33309,9 @@ async function run() {
         const octokit = new github_1.GitHub(githubToken);
         const { data: deployment } = await octokit.repos.createDeployment({
             ...github_1.context.repo,
-            ref: github_1.context.ref,
-            environment: environmentName
+            ref: github_1.context.ref.split("/")[2],
+            environment: environmentName,
+            required_contexts: []
         });
         try {
             const { deploymentUrl } = await deploy_1.default({
@@ -33332,7 +33333,6 @@ async function run() {
                 deployment_id: deployment.id,
                 state: "error"
             });
-            core.setFailed(error.message);
             throw error;
         }
     }
