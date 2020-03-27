@@ -1,5 +1,5 @@
-import github, { context } from "@actions/github";
-import core from "@actions/core";
+import { GitHub, context } from "@actions/github";
+import * as core from "@actions/core";
 import archiver from "archiver";
 import deploy from "./deploy";
 
@@ -32,7 +32,7 @@ async function run() {
     archive.directory(buildDirectory, false);
     archive.finalize();
 
-    const octokit = new github.GitHub(githubToken);
+    const octokit = new GitHub(githubToken);
 
     const { data: deployment } = await octokit.repos.createDeployment({
       ...context.repo,
