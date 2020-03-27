@@ -37,7 +37,8 @@ async function run() {
     const { data: deployment } = await octokit.repos.createDeployment({
       ...context.repo,
       ref: context.ref,
-      environment: environmentName
+      environment: environmentName,
+      required_contexts: []
     });
 
     try {
