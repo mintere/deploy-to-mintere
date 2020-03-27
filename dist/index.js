@@ -33280,8 +33280,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const github_1 = __importStar(__webpack_require__(469));
-const core_1 = __importDefault(__webpack_require__(470));
+const github_1 = __webpack_require__(469);
+const core = __importStar(__webpack_require__(470));
 const archiver_1 = __importDefault(__webpack_require__(248));
 const deploy_1 = __importDefault(__webpack_require__(926));
 function assumeEnvironmentName() {
@@ -33293,24 +33293,25 @@ function assumeEnvironmentName() {
 }
 async function run() {
     try {
-        const uploadUrl = core_1.default.getInput("uploadURL", {
+        const uploadUrl = core.getInput("uploadURL", {
             required: true
         });
-        const environmentName = core_1.default.getInput("environmentName", { required: false }) ||
+        const environmentName = core.getInput("environmentName", { required: false }) ||
             assumeEnvironmentName();
-        const githubToken = core_1.default.getInput("githubToken", { required: true });
-        const buildDirectory = core_1.default.getInput("buildDirectory", { required: true });
-        const deploymentKey = core_1.default.getInput("deploymentKey", { required: true });
+        const githubToken = core.getInput("githubToken", { required: true });
+        const buildDirectory = core.getInput("buildDirectory", { required: true });
+        const deploymentKey = core.getInput("deploymentKey", { required: true });
         const archive = archiver_1.default("zip", {
             zlib: { level: 3 }
         });
         archive.directory(buildDirectory, false);
         archive.finalize();
-        const octokit = new github_1.default.GitHub(githubToken);
+        const octokit = new github_1.GitHub(githubToken);
         const { data: deployment } = await octokit.repos.createDeployment({
             ...github_1.context.repo,
-            ref: github_1.context.ref,
-            environment: environmentName
+            ref: github_1.context.ref.split("/")[2],
+            environment: environmentName,
+            required_contexts: []
         });
         try {
             const { deploymentUrl } = await deploy_1.default({
@@ -33332,12 +33333,11 @@ async function run() {
                 deployment_id: deployment.id,
                 state: "error"
             });
-            core_1.default.setFailed(error.message);
             throw error;
         }
     }
     catch (error) {
-        core_1.default.setFailed(error.message);
+        core.setFailed(error.message);
         return;
     }
 }

@@ -1,5 +1,5 @@
-import github, { context } from "@actions/github";
-import core from "@actions/core";
+import { GitHub, context } from "@actions/github";
+import * as core from "@actions/core";
 import archiver from "archiver";
 import deploy from "./deploy";
 
@@ -32,12 +32,13 @@ async function run() {
     archive.directory(buildDirectory, false);
     archive.finalize();
 
-    const octokit = new github.GitHub(githubToken);
+    const octokit = new GitHub(githubToken);
 
     const { data: deployment } = await octokit.repos.createDeployment({
       ...context.repo,
-      ref: context.ref,
-      environment: environmentName
+      ref: context.ref.split("/")[2],
+      environment: environmentName,
+      required_contexts: []
     });
 
     try {
@@ -60,8 +61,6 @@ async function run() {
         deployment_id: deployment.id,
         state: "error"
       });
-
-      core.setFailed(error.message);
       throw error;
     }
   } catch (error) {
