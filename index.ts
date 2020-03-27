@@ -36,7 +36,7 @@ async function run() {
 
     const { data: deployment } = await octokit.repos.createDeployment({
       ...context.repo,
-      ref: context.ref,
+      ref: context.ref.split("/")[2],
       environment: environmentName,
       required_contexts: []
     });
@@ -61,8 +61,6 @@ async function run() {
         deployment_id: deployment.id,
         state: "error"
       });
-
-      core.setFailed(error.message);
       throw error;
     }
   } catch (error) {
