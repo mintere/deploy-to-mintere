@@ -12,7 +12,7 @@ inputs:
   uploadURL:
     description: "URL to Upload To"
     required: true
-    default: "https://sites.mintere.com/upload"
+    default: "https://api.mintere.site/upload"
   buildDirectory:
     description: "The subdirectory to deploy"
     required: true
