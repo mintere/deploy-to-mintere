@@ -9,9 +9,9 @@ inputs:
     description: "The name of the environment, defaults to the source branch name (or production if the branch name is master)."
     required: false
   uploadURL:
-    description: "URL to Upload To"
+    description: "API Path for Deployments"
     required: true
-    default: "https://api.mintere.site/upload"
+    default: "https://app.mintere.com/deployments"
   buildDirectory:
     description: "The subdirectory to deploy"
     required: true
