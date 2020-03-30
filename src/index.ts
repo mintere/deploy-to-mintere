@@ -1,7 +1,8 @@
 import { GitHub, context } from "@actions/github";
 import * as core from "@actions/core";
-import archiver from "archiver";
 import deploy from "./deploy";
+
+import tarFs from "tar-fs";
 
 function assumeEnvironmentName() {
   let envName =
@@ -25,43 +26,49 @@ async function run() {
     const buildDirectory = core.getInput("buildDirectory", { required: true });
     const deploymentKey = core.getInput("deploymentKey", { required: true });
 
-    const archive = archiver("zip", {
-      zlib: { level: 3 }
-    });
-
-    archive.directory(buildDirectory, false);
-    archive.finalize();
+    const pack = tarFs.pack(buildDirectory);
 
     const octokit = new GitHub(githubToken);
 
-    const { data: deployment } = await octokit.repos.createDeployment({
+    const githubDeploymentPromise = octokit.repos.createDeployment({
       ...context.repo,
       ref: context.ref.split("/")[2],
       environment: environmentName,
       required_contexts: []
     });
 
+    let t: {
+      state?: "success" | "error" | "failure";
+      description?: string;
+      target_url?: string;
+    } = {};
+
     try {
       const { deploymentUrl } = await deploy({
-        archive,
+        stream: pack,
         uploadUrl,
         deploymentKey,
         environment: environmentName
       });
 
-      octokit.repos.createDeploymentStatus({
-        ...context.repo,
-        deployment_id: deployment.id,
-        state: "success",
-        target_url: deploymentUrl
-      });
+      t.state = "success";
+      t.target_url = deploymentUrl;
     } catch (error) {
-      octokit.repos.createDeploymentStatus({
+      t.state = "error";
+      t.description =
+        error.message.length >= 140
+          ? error.message.slice(0, 135) + "..."
+          : error.message;
+    } finally {
+      const { data: deployment } = await githubDeploymentPromise;
+
+      await octokit.repos.createDeploymentStatus({
         ...context.repo,
-        deployment_id: deployment.id,
-        state: "error"
+        ...(t as {
+          state: "success" | "error" | "failure";
+        }),
+        deployment_id: deployment.id
       });
-      throw error;
     }
   } catch (error) {
     core.setFailed(error.message);

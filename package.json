@@ -1,12 +1,13 @@
 {
-  "name": "javascript-action",
+  "name": "deploy-to-mintere",
   "version": "1.0.0",
   "description": "JavaScript Action Template",
-  "main": "index.js",
+  "sourceType": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "lint": "eslint index.ts",
-    "package": "ncc build index.ts -o dist",
-    "test": "eslint index.ts && jest"
+    "lint": "eslint src/index.ts",
+    "package": "ncc build src/index.ts -o dist",
+    "test": "eslint src/index.ts && jest"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,8 @@
     "Actions",
     "JavaScript"
   ],
-  "author": "GitHub",
+  "private": true,
+  "author": "Mintere",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/actions/javascript-action/issues"
@@ -26,13 +28,17 @@
   "dependencies": {
     "@actions/core": "^1.1.1",
     "@actions/github": "^2.1.1",
-    "archiver": "^3.1.1",
-    "concat-stream": "^2.0.0",
+    "@types/node": "^13.9.5",
+    "@types/tar-fs": "^1.16.3",
+    "@types/tar-stream": "^2.1.0",
+    "node-fetch": "^2.6.0",
+    "tar-fs": "^2.0.1",
+    "tar-stream": "^2.1.2",
     "ts-node": "^8.8.1",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
-    "@types/archiver": "^3.1.0",
+    "@types/node-fetch": "^2.5.5",
     "@zeit/ncc": "^0.20.5",
     "eslint": "^6.3.0",
     "jest": "^24.9.0"
