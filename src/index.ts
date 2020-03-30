@@ -59,6 +59,7 @@ async function run() {
         error.message.length >= 140
           ? error.message.slice(0, 135) + "..."
           : error.message;
+      console.error(error)
     } finally {
       const { data: deployment } = await githubDeploymentPromise;
 
