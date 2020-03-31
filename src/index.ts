@@ -3,6 +3,7 @@ import * as core from "@actions/core";
 import deploy from "./deploy";
 
 import tarFs from "tar-fs";
+import fs from "fs";
 
 function assumeEnvironmentName() {
   let envName =
@@ -26,7 +27,13 @@ async function run() {
     const buildDirectory = core.getInput("buildDirectory", { required: true });
     const deploymentKey = core.getInput("deploymentKey", { required: true });
 
-    const pack = tarFs.pack(buildDirectory);
+    const writeFs = fs.createWriteStream("mintere-deploy.tar");
+
+    tarFs
+      .pack(buildDirectory, {
+        ignore: (name) => name == "mintere-deploy.tar"
+      })
+      .pipe(writeFs);
 
     const octokit = new GitHub(githubToken);
 
@@ -43,9 +50,14 @@ async function run() {
       target_url?: string;
     } = {};
 
+    await new Promise((res, rej) => {
+      writeFs.on("close", res);
+      writeFs.on("error", rej);
+    });
+
     try {
       const { deploymentUrl } = await deploy({
-        stream: pack,
+        stream: fs.createReadStream("mintere-deploy.tar"),
         uploadUrl,
         deploymentKey,
         environment: environmentName
@@ -59,7 +71,7 @@ async function run() {
         error.message.length >= 140
           ? error.message.slice(0, 135) + "..."
           : error.message;
-      console.error(error)
+      console.error(error);
     } finally {
       const { data: deployment } = await githubDeploymentPromise;
 
