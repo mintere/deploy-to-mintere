@@ -29,6 +29,16 @@ async function run() {
 
     const writeFs = fs.createWriteStream("mintere-deploy.tar");
 
+    console.log("Bundling deployment files");
+
+    const finishWrite = new Promise((res, rej) => {
+      writeFs.on("close", () => {
+        console.log("Done building deployment files");
+        res();
+      });
+      writeFs.on("error", rej);
+    });
+
     tarFs
       .pack(buildDirectory, {
         ignore: (name) => name == "mintere-deploy.tar"
@@ -50,12 +60,9 @@ async function run() {
       target_url?: string;
     } = {};
 
-    await new Promise((res, rej) => {
-      writeFs.on("close", res);
-      writeFs.on("error", rej);
-    });
-
     try {
+      await finishWrite;
+
       const { deploymentUrl } = await deploy({
         stream: fs.createReadStream("mintere-deploy.tar"),
         uploadUrl,
@@ -73,14 +80,14 @@ async function run() {
           : error.message;
       console.error(error);
     } finally {
-      const { data: deployment } = await githubDeploymentPromise;
+      const { data: ghDeployment } = await githubDeploymentPromise;
 
       await octokit.repos.createDeploymentStatus({
         ...context.repo,
         ...(t as {
           state: "success" | "error" | "failure";
         }),
-        deployment_id: deployment.id
+        deployment_id: ghDeployment.id
       });
     }
   } catch (error) {

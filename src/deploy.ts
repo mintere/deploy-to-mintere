@@ -35,6 +35,8 @@ export default async function deploy({
 
   formData.append("file", stream);
 
+  console.log(`Uploading (environment: ${environment})...`);
+
   const res = await fetch(uploadUrl, {
     method: "POST",
     body: formData,
