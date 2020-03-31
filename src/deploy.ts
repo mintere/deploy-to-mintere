@@ -43,7 +43,8 @@ export default async function deploy({
     redirect: "follow",
     headers: {
       ...formData.getHeaders(),
-      Authorization: `Bearer ${deploymentKey}`
+      Authorization: `Bearer ${deploymentKey}`,
+      Accept: "application/json"
     }
   });
 
