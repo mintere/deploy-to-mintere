@@ -13,7 +13,11 @@ const [buildDirectory, uploadUrl] = process.argv.slice(2);
 
 const writeFs = fs.createWriteStream("mintere-deploy.tar");
 
-tarFs.pack(buildDirectory).pipe(writeFs);
+tarFs.pack(buildDirectory, {
+  ignore(name) {
+    return name.match(/(\/|^).DS_Store$/);
+  }
+}).pipe(writeFs);
 
 writeFs.on("close", () => {
   deploy({
