@@ -9,7 +9,7 @@ const deploy = require("../src/deploy").default;
 
 const DEPLOYMENT_KEY = process.env.DEPLOYMENT_KEY;
 
-const [buildDirectory, uploadUrl] = process.argv.slice(2);
+const [buildDirectory, uploadUrl, environment = "staging"] = process.argv.slice(2);
 
 const writeFs = fs.createWriteStream("mintere-deploy.tar");
 
@@ -24,7 +24,7 @@ writeFs.on("close", () => {
     stream: fs.createReadStream("mintere-deploy.tar"),
     uploadUrl,
     deploymentKey: DEPLOYMENT_KEY,
-    environment: "staging"
+    environment
   })
     .then((data) => {
       console.log(data.deploymentUrl);
