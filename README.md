@@ -4,3 +4,5 @@
 </p>
 
 # Deploy to Mintere GitHub Action
+
+A GitHub Action for deploying to Mintere Sites
