@@ -63,7 +63,7 @@ async function run() {
     try {
       await finishWrite;
 
-      const { deploymentUrl } = await deploy({
+      await deploy({
         stream: fs.createReadStream("mintere-deploy.tar"),
         uploadUrl,
         deploymentKey,
@@ -71,7 +71,6 @@ async function run() {
       });
 
       t.state = "success";
-      t.target_url = deploymentUrl;
     } catch (error) {
       t.state = "error";
       t.description =

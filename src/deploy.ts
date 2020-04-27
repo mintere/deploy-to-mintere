@@ -1,13 +1,10 @@
 import FormData from "form-data";
 import fetch from "node-fetch";
-import { Readable } from "stream";
-import { IncomingMessage } from "http";
 
 interface DeploymentData {
   uid: string;
   environment: string;
   status: string;
-  deploymentUrl: string;
 }
 
 interface ServerDeploymentResponse {
@@ -24,7 +21,7 @@ export default async function deploy({
   deploymentKey,
   environment = "staging"
 }: {
-  stream: Readable;
+  stream: NodeJS.ReadableStream;
   uploadUrl: string;
   deploymentKey: string;
   environment: string;
@@ -49,7 +46,7 @@ export default async function deploy({
   });
 
   if (res.ok) {
-    const { deployment }: { deployment: DeploymentData } = await res.json();
+    const { deployment }: ServerDeploymentResponse = await res.json();
     console.log(`Deployment ${deployment.uid} uploaded`);
     // if (response.statusCode == 200) {
     return deployment;

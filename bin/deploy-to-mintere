@@ -26,8 +26,8 @@ writeFs.on("close", () => {
     deploymentKey: DEPLOYMENT_KEY,
     environment
   })
-    .then((data) => {
-      console.log(data.deploymentUrl);
+    .then(() => {
+      console.log("Deployed");
     })
     .catch((e) => {
       if (e.statusCode) console.error("Error status: ", e.status);
